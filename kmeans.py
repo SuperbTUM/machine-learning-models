@@ -9,16 +9,16 @@ def distribution(mean, covariance):
 
 
 def generate(pi):
-    mean1 = [0, 0]
-    cov1 = [[1, 0], [0, 1]]
-    mean2 = [3, 0]
-    cov2 = [[1, 0], [0, 1]]
-    mean3 = [0, 3]
-    cov3 = [[1, 0], [0, 1]]
-    gaussian1 = distribution(mean1, cov1)
-    gaussian2 = distribution(mean2, cov2)
-    gaussian3 = distribution(mean3, cov3)
-    return pi[0] * gaussian1 + pi[1] * gaussian2 + pi[2] * gaussian3
+    mean = [[0, 0], [3, 0], [0, 3]]
+    cov = [[1, 0], [0, 1]]
+    gauss1 = []
+    gauss2 = []
+    index = np.random.choice(3, 500, p=pi)
+    for i in range(3):
+        gauss1.append(np.random.multivariate_normal(mean[i], cov, 500))
+        gauss2.append(gauss1[i][index == i])
+    data = np.vstack(gauss2)
+    return data
 
 
 def L2_distance_square(x, y):
@@ -27,6 +27,7 @@ def L2_distance_square(x, y):
 
 def objective_function(centroids, assignments, data):
     objective = 0
+
     for i, d in enumerate(data):
         objective += L2_distance_square(d, centroids[assignments[i]])
     return objective
@@ -59,11 +60,11 @@ def KMeans(data, k=5, epochs=20):
 
 
 if __name__ == "__main__":
+
     data = generate([0.2, 0.5, 0.3])
     mark = ['or', 'ob', 'og', 'ok', '^r', '+r', 'sr', 'dr', '<r', 'pr']
     plt.figure()
     for k in range(2, 6):
-
         centroids, assignment, objectives = KMeans(data, k=k)
 
         plt.title("objective of kmeans")
